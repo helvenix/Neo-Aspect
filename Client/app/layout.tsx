@@ -17,7 +17,7 @@ import "./globals.css";
 
 
 export const metadata: Metadata = {
-  title: "Neo-Aspect by Helven",
+  title: "RizzQuizz by Helven",
   description: "Tryout type of web app by Helven for Ristek Recruitment Task",
 };
 
@@ -33,9 +33,9 @@ export default function RootLayout({
             </head>
             <body className={`antialiased font-sans`}>
                 <header className="flex w-full h-[72px] items-center absolute text-[18px] text-[#242424] bg-[#f4f4f4] ">
-                    <h1 className="flex justify-center absolute left-[48px]">
+                    <Link href="/" className="flex justify-center absolute left-[48px] font-semibold hover:text-[#5039bb] text-background">
                         Neo-Aspect
-                    </h1>
+                    </Link>
                     <div className="flex absolute right-[48px] gap-3">
                         <Button asChild variant={"logreg"} size={"sm"}>
                             <Link href="/register">Register</Link>
@@ -45,8 +45,8 @@ export default function RootLayout({
                         </Button>
                     </div>
                 </header>
-                <main>
-                    <Breadcrumb className="absolute top-[88px] left-[48px] ">
+                <main className={`w-full absolute top-[72px] bottom-[48px]`}>
+                    <Breadcrumb className="absolute top-[18px] left-[48px] ">
                         <BreadcrumbList>
                             <BreadcrumbItem>
                             <BreadcrumbLink href="/">
@@ -59,7 +59,6 @@ export default function RootLayout({
                             <Slash />
                             </BreadcrumbSeparator>
                         </BreadcrumbList>
-                        
                     </Breadcrumb>
                     {children}
                 </main>
