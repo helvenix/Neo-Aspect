@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link"
+import React from "react";
+import Link from "next/link";
  
 import { Button } from "@/components/ui/button"
 import { Slash } from "lucide-react"
