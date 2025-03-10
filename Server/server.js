@@ -18,6 +18,8 @@ mongoose.connect(MONGO_URI)
 .catch((err) => console.error('MongoDB connection error: ', err));
 
 app.use('/api/questions', questionRoutes);
+app.use('/', (req, res) => res.send("Neo-Aspect API..."))
+app.use('*', (req, res) => res.send("You've tried reaching a route that doesnt exist"))
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
