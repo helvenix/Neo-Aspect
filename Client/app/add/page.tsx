@@ -113,7 +113,7 @@ export default function Add(){
                 : [],
         }
         try {
-            const res = await fetch(`http://localhost:5000/api/questions/`, {
+            const res = await fetch(`https://4znq92hg-5000.asse.devtunnels.ms/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
