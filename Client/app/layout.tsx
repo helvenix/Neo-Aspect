@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
 import { Separator } from "@/components/ui/separator"
 
+
 import "./globals.css";
 
 
@@ -19,6 +20,8 @@ export default function RootLayout({
     }: Readonly<{
     children: React.ReactNode;
     }>) {
+        
+
     return (
         <html lang="en">
             <head>
@@ -29,14 +32,6 @@ export default function RootLayout({
                     <Link href="/" className="flex justify-center absolute left-[48px] font-semibold hover:text-[#5039bb] text-background">
                         RizzQuiz
                     </Link>
-                    <div className="flex absolute right-[48px] gap-3">
-                        <Button asChild variant={"logreg"} size={"sm"}>
-                            <Link href="/register">Register</Link>
-                        </Button>
-                        <Button asChild variant={"logreg"} size={"sm"}>
-                            <Link href="/login">Login</Link>
-                        </Button>
-                    </div>
                 </header>
                 <main className={`w-full absolute top-[72px] bottom-[48px]`}>
                     {children}

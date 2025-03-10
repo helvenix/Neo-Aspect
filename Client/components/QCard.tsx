@@ -39,7 +39,21 @@ import {
     ToggleGroupItem,
 } from "@/components/ui/toggle-group"
 import { toast } from "sonner"
-
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover" 
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import Link from "next/link";
  
 const formSchema = z.object({
     answer: z.string().min(1, {
@@ -50,6 +64,7 @@ const formSchema = z.object({
 })
 
 interface QCardProps {
+    id: number;
     title: string;
     diff: "default" | "destructive" | "outline" | "secondary" | "hard" | "medium" | "easy";
     type: "true-false" | "multiple-choices" | "form";
@@ -58,6 +73,8 @@ interface QCardProps {
     author: string;
     choices: string[];
     answer: string;
+    refresh: any;
+    userRole: "guest" | "user" | "admin"
 }
 
 function formatRelativeTime(dateString: string): string {
@@ -99,7 +116,8 @@ function formatRelativeTime(dateString: string): string {
     return `${years} year${years !== 1 ? "s" : ""} ago`;
 }
 
-export default function QCard({ title, diff, type, date, question, author, choices, answer }: QCardProps){
+export default function QCard({ id,title, diff, type, date, question, author, choices, answer, refresh, userRole}: QCardProps){
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -118,6 +136,29 @@ export default function QCard({ title, diff, type, date, question, author, choic
             })
         }
     }
+
+    async function handleDelete() {
+        try {
+            const res = await fetch(`http://localhost:5000/api/questions/${id}`, {
+                method: "DELETE",
+            });
+            if (res.ok) {
+                toast.success("Question deleted", {
+                description: `${title} has been deleted.`,
+                });
+                refresh();
+            } else {
+                const errorData = await res.json();
+                toast.error("Deletion failed", {
+                description: errorData.message || "Failed to delete question.",
+                });
+            }
+        } catch (err) {
+          console.error(err);
+          toast.error("Error", { description: "An error occurred during deletion." });
+        }
+    }
+    
     return (
         <Card className="h-[24vh] relative">
             <CardHeader>
@@ -126,7 +167,44 @@ export default function QCard({ title, diff, type, date, question, author, choic
                     <Badge variant={diff}>{diff}</Badge>
                     <Badge variant="outline">{type}</Badge>
                 </CardDescription>
-                <CardDescription className="absolute top-[24px] right-[36px]">{formatRelativeTime(date)}</CardDescription>
+                <CardDescription className="absolute top-[24px] right-[48px]">{formatRelativeTime(date)}</CardDescription>
+                {userRole === "admin" && (
+                    <Popover>
+                        <PopoverTrigger className="absolute top-[22px] right-[18px] w-[12px] cursor-pointer hover:text-[#f4f4f4]">⋮</PopoverTrigger>
+                        <PopoverContent className="w-[24vh] space-y-2">
+                            <Button 
+                                variant="default" 
+                                className="cursor-pointer w-full"
+                                asChild
+                            >
+                                <Link href={`edit/${id}`}>Edit</Link>
+                            </Button>
+                            <Dialog>
+                            <DialogTrigger asChild>
+                            <Button 
+                                variant="destructive" 
+                                className="cursor-pointer w-full"
+                            >Delete</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                <DialogTitle>Are you absolutely sure?</DialogTitle>
+                                <DialogDescription>
+                                    This action cannot be undone. This will permanently delete the question
+                                    and remove it from our servers.
+                                </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                    <Button 
+                                        variant="destructive" type="submit" className="cursor-pointer"
+                                        onClick={handleDelete}
+                                    >Confirm</Button>
+                                </DialogFooter>
+                            </DialogContent>
+                            </Dialog>
+                        </PopoverContent>
+                    </Popover>
+                )}
             </CardHeader>
             <CardContent>
                 <ScrollArea className="h-[8vh]">
@@ -140,92 +218,109 @@ export default function QCard({ title, diff, type, date, question, author, choic
                         Answer
                     </Button>
                 </DrawerTrigger>
+                {userRole !== "guest" && (
                 <DrawerContent className="h-[calc(50%+48px)]">
-                    <DrawerHeader>
-                    <DrawerTitle>
-                        {title}
-                        <Badge className="ml-2" variant={diff}>{diff}</Badge>
-                        <Badge className="ml-2" variant="outline">{type}</Badge>
-                    </DrawerTitle>
-                    <DrawerDescription>{formatRelativeTime(date)} | by {author}</DrawerDescription>
-                    <DrawerDescription className="text-[#f4f4f4]">{question}</DrawerDescription>
-                    </DrawerHeader>
-                    <DrawerFooter>
-                    <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                        {type === "form" && (
-                            <FormField
-                            control={form.control}
-                            name="answer"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Username</FormLabel>
-                                <FormControl>
-                                    <Textarea placeholder="Answer here..." {...field} />
-                                </FormControl>
-                                <FormMessage className="text-destructive"/>
-                                </FormItem>
+                        <DrawerHeader>
+                        <DrawerTitle>
+                            {title}
+                            <Badge className="ml-2" variant={diff}>{diff}</Badge>
+                            <Badge className="ml-2" variant="outline">{type}</Badge>
+                        </DrawerTitle>
+                        <DrawerDescription>{formatRelativeTime(date)} | by {author}</DrawerDescription>
+                        <DrawerDescription className="text-[#f4f4f4]">{question}</DrawerDescription>
+                        </DrawerHeader>
+                        <DrawerFooter>
+                        <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                            {type === "form" && (
+                                <FormField
+                                control={form.control}
+                                name="answer"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Username</FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder="Answer here..." {...field} />
+                                    </FormControl>
+                                    <FormMessage className="text-destructive"/>
+                                    </FormItem>
+                                )}
+                                />
                             )}
-                            />
-                        )}
-                        {type === "multiple-choices" && choices && (
-                            <FormField
-                                control={form.control}
-                                name="answer"
-                                render={({ field }) => (
-                                <FormItem className="space-y-3">
-                                    <FormLabel>Select the correct answer</FormLabel>
-                                    <FormControl>
-                                    <RadioGroup
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                        className="flex flex-col space-y-2"
-                                    >
-                                        <ScrollArea className='max-h-[24vh] pr-3'>
-                                            <div className="space-y-2">
-                                            {choices.map((choice, index) => (
-                                                <FormItem key={index} className="flex items-center space-x-3">
-                                                    <FormControl>
-                                                    <RadioGroupItem value={choice} />
-                                                    </FormControl>
-                                                    <FormLabel className="font-normal">{choice}</FormLabel>
-                                                </FormItem>
-                                            ))}
-                                            </div>
-                                        </ScrollArea>
-                                    </RadioGroup>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                                )}
-                            />
-                        )}
-                        {type === "true-false" && (
-                            <FormField
-                                control={form.control}
-                                name="answer"
-                                render={({ field }) => (
-                                <FormItem className="mb-12">
-                                    <FormLabel>Select True or False</FormLabel>
-                                    <FormControl>
-                                    <ToggleGroup type="single" value={field.value} onValueChange={field.onChange} className="w-[48vh]">
-                                        <ToggleGroupItem value="true">true</ToggleGroupItem>
-                                        <ToggleGroupItem value="false">false</ToggleGroupItem>
-                                    </ToggleGroup>
-                                    </FormControl>
-                                    <FormMessage className="text-destructive" />
-                                </FormItem>
-                                )}
-                            />
-                        )}
-                        <Button className="w-full mb-2" type="submit">Submit</Button>
-                    </form>
-                    <DrawerClose asChild>
-                        <Button variant="outline">Close</Button>
-                    </DrawerClose>
-                    </Form>
-                    </DrawerFooter>
-                </DrawerContent>
+                            {type === "multiple-choices" && choices && (
+                                <FormField
+                                    control={form.control}
+                                    name="answer"
+                                    render={({ field }) => (
+                                    <FormItem className="space-y-3">
+                                        <FormLabel>Select the correct answer</FormLabel>
+                                        <FormControl>
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                            className="flex flex-col space-y-2"
+                                        >
+                                            <ScrollArea className='max-h-[24vh] pr-3'>
+                                                <div className="space-y-2">
+                                                {choices.map((choice, index) => (
+                                                    <FormItem key={index} className="flex items-center space-x-3">
+                                                        <FormControl>
+                                                        <RadioGroupItem value={choice} />
+                                                        </FormControl>
+                                                        <FormLabel className="font-normal">{choice}</FormLabel>
+                                                    </FormItem>
+                                                ))}
+                                                </div>
+                                            </ScrollArea>
+                                        </RadioGroup>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                            )}
+                            {type === "true-false" && (
+                                <FormField
+                                    control={form.control}
+                                    name="answer"
+                                    render={({ field }) => (
+                                    <FormItem className="mb-12">
+                                        <FormLabel>Select True or False</FormLabel>
+                                        <FormControl>
+                                        <ToggleGroup type="single" value={field.value} onValueChange={field.onChange} className="w-[48vh]">
+                                            <ToggleGroupItem value="true">true</ToggleGroupItem>
+                                            <ToggleGroupItem value="false">false</ToggleGroupItem>
+                                        </ToggleGroup>
+                                        </FormControl>
+                                        <FormMessage className="text-destructive" />
+                                    </FormItem>
+                                    )}
+                                />
+                            )}
+                            <Button className="w-full mb-2" type="submit">Submit</Button>
+                        </form>
+                        <DrawerClose asChild>
+                            <Button variant="outline">Close</Button>
+                        </DrawerClose>
+                        </Form>
+                        </DrawerFooter>
+                    </DrawerContent>
+                    )}
+                    {userRole === "guest" && (
+                        <DrawerContent className="h-[24vh]">
+                            <DrawerHeader>
+                            <DrawerTitle className="text-center">You must login to answer this question</DrawerTitle>
+                            </DrawerHeader>
+                            <DrawerFooter>
+                            <DrawerClose className="space-y-3">
+                            <Button asChild variant={"logreg"} className="w-full border-1">
+                                <Link href="/login">Login</Link>
+                            </Button>
+                                <Button variant="outline">Cancel</Button>
+                            </DrawerClose>
+                            </DrawerFooter>
+                        </DrawerContent>
+                    )}
                 </Drawer>
                 </CardFooter>
         </Card>

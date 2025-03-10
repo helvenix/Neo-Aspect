@@ -30,7 +30,8 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
 const formSchema = z.object({
     title: z.string().min(1, {
@@ -86,6 +87,15 @@ export default function Add(){
         console.log("Validation Errors:", form.formState.errors);
     }, [form.formState.errors]);
 
+    const [userRole, setUserRole] = useState<"guest" | "user" | "admin">("guest");
+    
+    useEffect(() => {
+        const storedRole = localStorage.getItem("userRole");
+        if (storedRole === "admin" || storedRole === "user") {
+            setUserRole(storedRole);
+        }
+    }, []);
+
     const questionType = form.watch("type");
 
     const { fields, append, remove } = useFieldArray<FormValues>({
@@ -97,7 +107,7 @@ export default function Add(){
     async function onSubmit(values: z.infer<typeof formSchema>){
         const newQuestion = {
             ...values,
-            author: "Helven",
+            author: userRole,
             choices: values.type === "multiple-choices"
                 ? values.choices.map(choiceObj => choiceObj.value)
                 : [],
@@ -119,6 +129,19 @@ export default function Add(){
             console.error(err);
         }
     }
+
+    if(userRole !== "admin") return (
+        <div className="flex w-full h-full flex-col items-center justify-center p-4">
+            <h1 className="text-5xl font-bold">404</h1>
+            <p className="mt-4 text-lg mb-5">
+                Oops! We couldn’t find the page you’re looking for.
+            </p>
+            <Button asChild variant={"link"} size={"sm"}>
+                <Link href="/">Go back home</Link>
+            </Button>
+        </div>
+    )
+    
     return (
         <>
             <Breadcrumb className="absolute top-[18px] left-[48px] ">
