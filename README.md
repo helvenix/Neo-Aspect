@@ -68,8 +68,8 @@ For demo purposes, this project uses hard-coded credentials (since the registrat
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repository-url>
-   cd <frontend-directory>
+   git clone https://github.com/helvenix/Neo-Aspect.git
+   cd Client
     ```
 2. **install dependencies:**
    ```bash
@@ -87,7 +87,7 @@ For demo purposes, this project uses hard-coded credentials (since the registrat
 
 1. **Navigate to the backend directory:**
    ```bash
-   cd <backend-directory>
+   cd Server
     ```
 2. **install dependencies:**
    ```bash
