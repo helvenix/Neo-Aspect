@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import React from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
-import { Separator } from "@/components/ui/separator"
 
 
 import "./globals.css";
@@ -11,7 +9,7 @@ import "./globals.css";
 
 
 export const metadata: Metadata = {
-  title: "RizzQuizz by Helven",
+  title: "Neo-Aspect by Helven",
   description: "Tryout type of web app by Helven for Ristek Recruitment Task",
 };
 
@@ -30,7 +28,7 @@ export default function RootLayout({
             <body className={`antialiased font-sans`}>
                 <header className="flex w-full h-[72px] items-center absolute text-[18px] text-[#242424] bg-[#f4f4f4] ">
                     <Link href="/" className="flex justify-center absolute left-[48px] font-semibold hover:text-[#5039bb] text-background">
-                        RizzQuiz
+                        Neo-Aspect
                     </Link>
                 </header>
                 <main className={`w-full absolute top-[72px] bottom-[48px]`}>
