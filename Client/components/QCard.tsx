@@ -139,7 +139,7 @@ export default function QCard({ id,title, diff, type, date, question, author, ch
 
     async function handleDelete() {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${id}`, {
+            const res = await fetch(`https://neo-aspect-production.up.railway.app/api/questions/${id}`, {
                 method: "DELETE",
             });
             if (res.ok) {
