@@ -139,7 +139,7 @@ export default function QCard({ id,title, diff, type, date, question, author, ch
 
     async function handleDelete() {
         try {
-            const res = await fetch(`http://localhost:5000/api/questions/${id}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${id}`, {
                 method: "DELETE",
             });
             if (res.ok) {
