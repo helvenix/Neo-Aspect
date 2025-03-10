@@ -168,9 +168,9 @@ export default function Edit() {
             <Slash />
           </BreadcrumbSeparator>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/add">
+            <BreadcrumbLink href={`/edit/${id}`}>
               <Button className="cursor-pointer" variant="link">
-                Add
+                Edit
               </Button>
             </BreadcrumbLink>
           </BreadcrumbItem>
