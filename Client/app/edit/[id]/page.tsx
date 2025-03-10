@@ -99,7 +99,7 @@ export default function Edit() {
 
   useEffect(() => {
     if (id) {
-      fetch(`https://4znq92hg-5000.asse.devtunnels.ms/${id}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}${id}`)
         .then((res) => res.json())
         .then((data) => {
           const choicesObjects = data.choices.map((choice: string) => ({ value: choice }));
@@ -125,7 +125,7 @@ export default function Edit() {
         : [],
     };
     try {
-      const res = await fetch(`https://4znq92hg-5000.asse.devtunnels.ms/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"

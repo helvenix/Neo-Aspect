@@ -117,7 +117,7 @@ export default function Home() {
 
     const fetchQuestions = async () => {
         try {
-          const res = await fetch(`https://4znq92hg-5000.asse.devtunnels.ms/`);
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}`);
           if (!res.ok) {
             throw new Error("Failed to fetch questions");
           }
